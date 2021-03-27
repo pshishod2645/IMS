@@ -1,0 +1,42 @@
+{% extends 'base.j2' %}
+{% block content %}
+
+<form action="" method="post" id="signup">
+	<div class="form-group">
+	      <label for="username">Username</label>
+	      <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
+    </div>
+	<div class="form-group">
+	      <label for="email">Email</label>
+	      <input type="email" class="form-control" id="email" name="email" placeholder="Enter email address" required>
+    </div>
+    <div class="form-group">
+	      <label for="fullname">Full Name</label>
+	      <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Enter your full name" required>
+    </div>
+	<div class="form-group">
+	      <label for="rollno">Roll Number</label>
+	      <input type="text" class="form-control" id="rollno" name="rollno" placeholder="Enter roll number" required>
+    </div>
+	<div class="form-group">
+	      <label for="cgpa">CGPA</label>
+	      <input type="number" class="form-control" id="cgpa" name="cgpa" min="0" step="0.01" max="10" step="" placeholder="Enter cgpa" required>
+    </div>
+	<div class="form-group">
+	      <label for="department">Department</label>
+	      <select class="form-control" id="dep_code" name="dep_code" required>
+            {% for department in departments %}
+                <option> {department.dep_code} </option>
+            {% endfor %}
+		  </select>
+    </div>  
+    <div class="form-group">
+	      <label for="password">Password</label>
+	      <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+  	</div>
+  	<div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>
+
+{% endblock %}
