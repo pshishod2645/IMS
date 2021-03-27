@@ -3,17 +3,18 @@ from flask import Flask
 from flask import render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
-from flask_login import LoginManager, current_user, login_user, logout_user, login_required
+from flask_login import LoginManager, current_user, login_user, logout_user, login_required, UserMixin
 from models import * 
 from flask_admin.contrib.sqla import ModelView
 
 #Configurations
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:password@localhost/dbms'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+db.Model.metadata.reflect(db.engine)
 admin = Admin(app)
 
 login_manager = LoginManager(app)
@@ -21,8 +22,8 @@ login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
 
 @login_manager.user_loader
-def load_user(user): 
-    return user
+def load_user(user_id): 
+    return User.query.filter(User.username == user_id).first()
 
 #Configuration ends here 
 

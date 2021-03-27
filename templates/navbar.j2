@@ -12,8 +12,8 @@
         </ul>
         
         <ul class = "navbar-nav"> 
-        {% if false %}
-          {# {% if current_user.is_authenticated %} #}
+        {#{% if false #%}#}
+          {% if current_user.is_authenticated %}
             <li> 
               <a class = "nav-link" href = "{{'/profile/' + current_user.username}}">My Profile</a>
             </li> 
