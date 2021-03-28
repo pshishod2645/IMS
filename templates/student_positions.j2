@@ -1,1 +1,59 @@
-hello {{current_user.username }}
+{% extends 'base.j2' %}
+{% block content %}
+<table class="table table-hover">
+    <thead>
+        <tr>
+        <th scope="col">Position ID</th>
+        <th scope="col">Role</th>
+        <th scope="col">Company</th>
+        <th scope="col">CGPA Cutoff</th>
+        <th scope="col">Location</th>
+        <th scope="col">Application</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pos in positions %}
+            <tr data-toggle="collapse" data-target="#desc_{{ pos.pos_id }}" class="clickable">
+                <th scope="row"> {{ pos.pos_id }} </th>
+                <td> {{ pos.role }} </td>
+                <td> {{ pos.company_name }} </td>
+                <td> {{ pos.cgpa_cutoff }} </td>
+                <td> {{ pos.location }}</td>
+                <td> 
+                <button id="apply_{{ pos.pos_id }}" onclick="apply(event, {{ pos.pos_id }})" type="button"
+                class="btn btn-outline-dark">Apply</button>
+                </td>
+            </tr>
+            <tr>
+			    <td colspan="6" style="padding:0;">
+			        <div class="collapse" id="desc_{{ pos.pos_id }}">
+			        	Position description: {{ pos.description }}
+			    	</div>
+			    </td>
+			</tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% block javascript %}
+<script>
+function apply(event, pos_id) {
+  var apply_button = document.getElementById("apply_"+pos_id);
+  apply_button.disabled = true;
+  event.stopPropagation();
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        apply_button.value = "Applied";
+    } else {
+        apply_button.value = "Failed";
+    }
+  };
+  apply_button.value = "Applied";
+  xhttp.open("POST", "/students/apply_to_position/" + pos_id.to_string(), true);
+  xhttp.send();
+}
+</script>
+{% endblock %}
+
+{% endblock %}
+

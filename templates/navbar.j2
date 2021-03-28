@@ -7,12 +7,35 @@
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
             <li> 
-            <a class = "nav-link disabled" area-disabled = "true" href = "#">IMS</a> 
+            <a href = "/">
+            <span class="navbar-brand mb-0 h1">
+            <i class="material-icons d-inline-block align-top" style="font-size:25px;color:white;">business_center</i>
+            IMS
+            </span> 
+            </a> 
             </li> 
         </ul>
         
         <ul class = "navbar-nav"> 
         {#{% if false #%}#}
+          {% if current_user.user_type in ['student', 'placecom', 'deprep'] %}
+            <li class = "nav-item">
+              <a class = "nav-link" href = "/student/positions" > Positions </a>
+            </li>
+          {% endif %}
+
+          {% if current_user.user_type == 'deprep'%}
+            <li class = "nav-item"> 
+              <a class = "nav-link" href = "/dep_statistics">Dep Statistics</a> 
+            </li> 
+          {% endif %}
+
+          {% if current_user.user_type == 'hr' %}
+            <li class = "nav-item"> 
+              <a class = "nav-item" href = "/hr/positions">Positions</a> 
+            </li> 
+          {% endif %}
+          
           {% if current_user.is_authenticated %}
             <li> 
               <a class = "nav-link" href = "{{'/profile/' + current_user.username}}">My Profile</a>
@@ -31,7 +54,7 @@
               <a class = "nav-link" href = "/signup">Signup</a> 
             </li> 
 
-          {% endif %} 
+          {% endif %}
         </ul>
     </div>
   </nav>
