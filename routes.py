@@ -14,9 +14,10 @@ def login():
 
     if request.method == 'POST' : 
         username, password = request.form.get('username'), request.form.get('password')
-        user = User.query.filter((User.email == username or User.username == username) and User.password == password).first()
+        user = User.query.filter( ((User.email == username) | (User.username == username) ) & (User.password == password) ).first()
         # print(user)
         if user : 
+            print(user)
             login_user(user)
             return redirect('/')
     return render_template('login.j2')
@@ -51,6 +52,55 @@ def signup():
         return redirect('/')
     return render_template('signup.j2')
 
+@login_required
+@app.route('/logout')
 def logout(): 
     logout_user()
     return redirect('/')
+
+@login_required
+@app.route('/student/positions')
+def studentPositions(): 
+    if current_user.user_type not in ['student', 'placecom', 'deprep']:
+        pass
+
+    student = Student.query.filter_by(username = current_user.username).first()
+    appliedPositions = ApplyToPosition.query.filter_by(roll_no = student.roll_no).all()
+    appliedPositions = [a2P.pos_id for a2P in appliedPositions]
+    assert student is not None
+
+    positions = Position.query.filter(student.cgpa >= Position.cgpa_cutoff).all()
+    for position in positions: 
+        position.applied = (position.pos_id in appliedPositions)
+
+        return render_template('student_positions.j2', positions = positions)
+
+@login_required
+@app.route('/student/apply_to_position/<int:pos_id>')
+def applyToPosition(pos_id): 
+    if current_user.user_type not in ['student', 'placecom', 'deprep']: 
+        pass
+    
+    try : 
+        student = Student.query.filter_by(username = current_user.username).first()
+        a2P = ApplyToPosition()
+        a2P.roll_no = student.roll_no
+        a2P.pos_id = pos_id
+
+        db.session.add(a2P), db.session.commit()
+    except: 
+        return 'Database fucked up or Invalid Data'
+    return 'Applied'
+
+@login_required
+@app.route('/dep_statistics') 
+def depStatistics(): 
+    if current_user.user_type not in ['dep'] : 
+        pass
+
+    dep = Department.query.filter((Student.username == 'ankit.karn') & (Student.dep_code == Department.dep_code) ).first()
+    try: 
+        assert dep is not None
+    except: 
+        return 'No Department found! Inconsistencies in Database'
+    return render_template('dep_statistics.j2', dep = dep)
