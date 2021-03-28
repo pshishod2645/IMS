@@ -1,7 +1,7 @@
 {% extends 'base.j2' %}
 {% block content %}
 
-<form action="" method="post" id="signup">
+<form action="" method="post" id="signup" class="mt-3 ml-3 col-sm-6">
 	<div class="form-group">
 	      <label for="username">Username</label>
 	      <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
@@ -25,8 +25,8 @@
 	<div class="form-group">
 	      <label for="department">Department</label>
 	      <select class="form-control" id="dep_code" name="dep_code" required>
-            {% for department in departments %}
-                <option> {department.dep_code} </option>
+            {% for depcode in depcodes %}
+                <option> {{ depcode }} </option>
             {% endfor %}
 		  </select>
     </div>  

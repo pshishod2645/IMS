@@ -51,6 +51,11 @@ def signup():
     if current_user.is_authenticated: 
         return redirect('/')
 
+    if request.method == 'GET':
+        departments = Department.query.all()
+        departments = [d.dep_code for d in departments]
+        return render_template('signup.j2', depcodes = departments)
+
     if request.method == 'POST':        # only for students
         print(requests.form)
     return render_template('signup.j2')
