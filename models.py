@@ -5,6 +5,7 @@ from flask_login import UserMixin
 # create table user(username varchar(255), password varchar(255) NOT NULL, email varchar(320), full_name varchar(255), primary key(username));
 class User(db.Model, UserMixin) :
     __table__ = db.Model.metadata.tables['user']
+    
     def get_id(self):
            return (self.username)
     @property

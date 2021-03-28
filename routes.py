@@ -14,9 +14,10 @@ def login():
 
     if request.method == 'POST' : 
         username, password = request.form.get('username'), request.form.get('password')
-        user = User.query.filter((User.email == username or User.username == username) and User.password == password).first()
+        user = User.query.filter( ((User.email == username) | (User.username == username) ) & (User.password == password) ).first()
         # print(user)
         if user : 
+            print(user)
             login_user(user)
             return redirect('/')
     return render_template('login.j2')
@@ -51,6 +52,14 @@ def signup():
         return redirect('/')
     return render_template('signup.j2')
 
+@app.route('/logout')
 def logout(): 
     logout_user()
     return redirect('/')
+
+@login_required
+@app.route('/student/positions')
+def studentPositions(): 
+    if current_user.user_type not in ['student', 'placecom', 'deprep']:
+        pass
+    return render_template('student_positions.j2')
