@@ -27,12 +27,28 @@ def signup():
         return redirect('/')
 
     if request.method == 'GET':
-        departments = Department.query.all()
-        departments = [d.dep_code for d in departments]
-        return render_template('signup.j2', depcodes = departments)
+        return render_template('signup.j2', departments = Department.query.all())
 
     if request.method == 'POST':        # only for students
-        print(requests.form)
+        form = request.form
+        user = User()
+        user.username = form.get('username'),
+        user.email = form.get('email'), 
+        user.password = form.get('password'), 
+        user.full_name = form.get('fullname'), 
+        user.user_type = 'student' 
+
+        student = Student()
+        student.username = form.get('username'), 
+        student.roll_no = form.get('rollno'), 
+        student.cgpa = form.get('cgpa'), 
+        student.dep_code = form.get('dep_code') 
+
+        db.session.add(user), db.session.commit()
+        db.session.add(student), db.session.commit()
+
+        login_user(user)
+        return redirect('/')
     return render_template('signup.j2')
 
 def logout(): 
