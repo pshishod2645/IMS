@@ -60,6 +60,7 @@ def signup():
         print(requests.form)
     return render_template('signup.j2')
 
+@app.route('/logout', methods = ['GET', 'POST'])
 def logout(): 
     logout_user()
     return redirect('/')
