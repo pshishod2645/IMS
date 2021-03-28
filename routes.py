@@ -73,10 +73,10 @@ def studentPositions():
     for position in positions: 
         position.applied = (position.pos_id in appliedPositions)
 
-        return render_template('student_positions.j2', positions = positions)
+    return render_template('student_positions.j2', positions = positions)
 
 @login_required
-@app.route('/student/apply_to_position/<int:pos_id>')
+@app.route('/student/apply_to_position/<int:pos_id>', methods=['GET', 'POST'])
 def applyToPosition(pos_id): 
     if current_user.user_type not in ['student', 'placecom', 'deprep']: 
         pass
