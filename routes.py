@@ -178,8 +178,5 @@ def studentInterviews():
         interview.position = Position.query.get(interview.pos_id)
     
     max_rounds = max([interview.round for interview in all_interviews])
-    interviews = [[]] * max_rounds
-    for interview in all_interviews : 
-        interviews[interview.round - 1].append(interview)
 
-    return render_template('student_interviews.j2', interviews = interviews)
+    return render_template('student_interviews.j2', interviews = all_interviews, max_rounds = max_rounds)
