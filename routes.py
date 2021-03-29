@@ -87,7 +87,7 @@ def applyToPosition(pos_id):
         interview.roll_no = student.roll_no
         interview.pos_id = pos_id
         interview.round = 1
-
+        interview.status = 'pending'
         db.session.add(interview), db.session.commit()
     except:
         print('Database fuckedup or invalid data') 
@@ -186,7 +186,7 @@ def studentInterviews():
             (Interview.qualified == True) ) 
     
     if len(all_interviews) == 0 : 
-        return render_template('students_interviews.j2', interviews = [])
+        return render_template('student_interviews.j2', interviews = [])
 
     for interview in all_interviews: 
         interview.position = Position.query.get(interview.pos_id)
