@@ -1,6 +1,7 @@
 {% extends 'base.j2' %}
 {% block content %}
 
+<a role = "button" class = "btn btn-info" href = "/hr/createPosition">Create New Position</a> 
 {% for position in positions %}
     {{position.pos_id}}, Students - 
     {% for student in position.students %}
