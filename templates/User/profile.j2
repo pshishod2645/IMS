@@ -3,7 +3,7 @@
 <ul class="list-group mt-3 ml-3">
   <li class="list-group-item">Username: {{ current_user.username }}</li>
   <li class="list-group-item">Email: {{ current_user.email }} </li>
-  <li class="list-group-item">Full Name: {{ current_user.fullname }}</li>
+  <li class="list-group-item">Full Name: {{ current_user.full_name }}</li>
 {% if current_user.user_type == "student" %}
   <li class="list-group-item">Account Type: STUDENT</li>
   <li class="list-group-item">Roll Number: {{ person.roll_no }}</li>

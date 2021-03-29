@@ -42,7 +42,7 @@ def approveOrRejectForPosition(pos_id, roll_no, round):
         return Response(status = 201)
     
     status = request.args.get('status')
-    qualified = request.args.get('qualified', type = bool)
+    qualified = request.args.get('qualified')
 
     position = Position.query.filter_by(pos_id = pos_id).first()
     interview = Interview.query.filter_by(pos_id = pos_id, roll_no = roll_no, round = round).first()

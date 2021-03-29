@@ -113,7 +113,7 @@ function update_qualified(roll_no, round) {
   if(qualified_button.innerText == "Update") {
       qualified_button.innerText = "Confirm";
       qual_cell.innerHTML = 
-      '<select class="form-control" id="newqual" required><option value = "True">Qualified</option><option value = "False">Not Qualified</option></select>';
+      '<select class="form-control" id="newqual" required><option value = 1>Qualified</option><option value = 0>Not Qualified</option></select>';
   } else {
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {

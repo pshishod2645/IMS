@@ -1,7 +1,7 @@
 {% extends 'base.j2' %}
 {% block content %}
 
-<div id="chart_div"></div>
+<div style="height:100vh;" id="chart_div"></div>
 
 {% block javascript %}
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -12,13 +12,14 @@ google.charts.setOnLoadCallback(drawBasic);
 function drawBasic() {
 
      var data = google.visualization.arrayToDataTable([
-        ["Element", "Density", { role: "style" } ],
+        ["Element", "Number of Students", { role: "style" } ],
         ["Students Placed", {{ dep.placed }}, 'color: #76A7FA'],
         ["Students Shortlisted", {{ dep.shortlisted }}, 'color: #76A7FA']
       ]);
 
       var options = {
-        title: 'Placement Statistics'
+        title: 'Placement Statistics',
+        legend: {position:'none'}
       };
 
       var chart = new google.visualization.ColumnChart(
