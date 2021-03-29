@@ -10,8 +10,9 @@ def hrPositions():
         return redirect('/')
 
     positions = Position.query.filter( (Position.company_name == HR.company_name) & (HR.username == current_user.username)).all()
+    hr = HR.query.get(current_user.username)
 
-    return render_template('HR/positions.j2', positions = positions, company_name = "amazon")
+    return render_template('HR/positions.j2', positions = positions, company_name = hr.company_name)
 
 @login_required
 @app.route('/hr/position/<int:pos_id>')

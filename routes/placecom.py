@@ -20,3 +20,48 @@ def allInterviews():
         max_rounds = max([interview.round for interview in interviews])
 
     return render_template('Placecom/allInterviews.j2', interviews = interviews, max_rounds = max_rounds)
+
+@login_required
+@app.route('/addHR', methods = ['GET', 'POST'])
+def addHR(): 
+    if current_user.user_type not in ['placecom', 'hr'] : 
+        redirect('/')
+    
+    companies = []
+    if current_user.user_type == 'hr': 
+        companies = [HR.query.get(current_user.username).company_name]
+    else : 
+        companies = [c.company_name for c in Company.query.all()]
+
+
+    if request.method == 'POST' : 
+        placecom = Student.query.get(current_user.username)
+        form = request.form
+        placecom_assgn_roll_no = None
+
+        if current_user.user_type == 'hr' : 
+            placecom_assgn_roll_no = HR.query.get(current_user.username).placecom_assgn_roll_no
+        else : 
+            placecom_assgn_roll_no = Student.query.get(current_user.username).roll_no
+
+        print(form)
+        if form.get('company_name') not  in companies : 
+            return Response(status = 201)
+
+        user, hr = User(), HR()
+        # username, company_name, placecom_assgn_roll_no, password, email, full_name 
+        user.username = form.get('username', type = str)
+        user.password = form.get('password', type = str)
+        user.email = form.get('email', type = str)
+        user.full_name = form.get('full_name', type = str)
+        user.user_type = 'hr'
+
+        hr.username = user.username 
+        hr.company_name = form.get('company_name', type = str)
+        hr.placecom_assgn_roll_no = placecom_assgn_roll_no
+
+        db.session.add(user), db.session.commit()
+        db.session.add(hr), db.session.commit()
+        return 'Account Added'
+
+    return render_template('Placecom/addHR.j2', companies = companies)
