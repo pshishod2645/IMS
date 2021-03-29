@@ -42,14 +42,16 @@ function apply(event, pos_id) {
   event.stopPropagation();
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
+      console.log(this.status);
     if (this.readyState == 4 && this.status == 200) {
-        apply_button.value = "Applied";
+        apply_button.innerHTML = "Applied";
     } else {
-        apply_button.value = "Failed";
+        apply_button.innerHTML = "Failed";
     }
   };
+  console.log(pos_id, typeof(pos_id));
   apply_button.value = "Applied";
-  xhttp.open("POST", "/students/apply_to_position/" + pos_id.to_string(), true);
+  xhttp.open("POST", "/student/apply_to_position/" + pos_id, true);
   xhttp.send();
 }
 </script>

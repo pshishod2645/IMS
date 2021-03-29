@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, Response
 from flask_login import current_user, login_user, logout_user, login_required, UserMixin
 from models import * 
 from wsgi import db, app
@@ -62,7 +62,7 @@ def logout():
 @app.route('/student/positions')
 def studentPositions(): 
     if current_user.user_type not in ['student', 'placecom', 'deprep']:
-        pass
+        return redirect('/')
 
     student = Student.query.filter_by(username = current_user.username).first()
     appliedPositions = ApplyToPosition.query.filter_by(roll_no = student.roll_no).all()
@@ -73,13 +73,13 @@ def studentPositions():
     for position in positions: 
         position.applied = (position.pos_id in appliedPositions)
 
-        return render_template('student_positions.j2', positions = positions)
+    return render_template('student_positions.j2', positions = positions)
 
 @login_required
-@app.route('/student/apply_to_position/<int:pos_id>')
+@app.route('/student/apply_to_position/<int:pos_id>', methods = ["POST"])
 def applyToPosition(pos_id): 
     if current_user.user_type not in ['student', 'placecom', 'deprep']: 
-        pass
+        return flask.Response(status = 201)
     
     try : 
         student = Student.query.filter_by(username = current_user.username).first()
@@ -88,15 +88,16 @@ def applyToPosition(pos_id):
         a2P.pos_id = pos_id
 
         db.session.add(a2P), db.session.commit()
-    except: 
-        return 'Database fucked up or Invalid Data'
-    return 'Applied'
+    except:
+        print('Database fuckedup or invalid data') 
+        return Response(status = 201)
+    return Response(status = 200)
 
 @login_required
 @app.route('/dep_statistics') 
 def depStatistics(): 
     if current_user.user_type not in ['dep'] : 
-        pass
+        return redirect('/')
 
     dep = Department.query.filter((Student.username == 'ankit.karn') & (Student.dep_code == Department.dep_code) ).first()
     try: 
@@ -104,3 +105,28 @@ def depStatistics():
     except: 
         return 'No Department found! Inconsistencies in Database'
     return render_template('dep_statistics.j2', dep = dep)
+
+@login_required
+@app.route('/hr/positions')
+def hrPositions():
+    if current_user.user_type not in     ['hr']: 
+        return redirect('/')
+
+    positions = Position.query.filter( (Position.company_name == HR.company_name) & (HR.username == current_user.username)).all()
+
+    for position in positions: 
+        position.students = Student.query.filter((Student.roll_no == ApplyToPosition.roll_no) & \
+            (ApplyToPosition.pos_id == position.pos_id)).all()
+
+    return render_template('hr_positions.j2', positions = positions)
+
+@login_required
+@app.route('/hr/<int:pos_id>/shcedule/<str:roll_no>')
+def approveOrRejectForPosition(): 
+    if current_user.user_type not in ['hr'] : 
+        return redirect('/')
+    
+    interview = Interview()
+    interview.pos_id = pos_id
+    return 'hello'
+    
