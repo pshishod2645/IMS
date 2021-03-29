@@ -1,0 +1,11 @@
+{% extends 'base.j2' %}
+{% block content %}
+
+{% for position in positions %}
+    {{position.pos_id}}, Students - 
+    {% for student in position.students %}
+    {{ student.roll_no }}
+    {% endfor %}
+{% endfor %}
+
+{% endblock %}

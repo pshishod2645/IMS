@@ -1,0 +1,34 @@
+{% extends 'base.j2' %}
+{% block content %}
+{% for i in range(0, (interviews | length)) %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+            <th colspan="6" class="text-center">Round {{ i + 1}}</th>
+            </tr>
+            <tr>
+            <th scope="col">Position ID</th>
+            <th scope="col">Role</th>
+            <th scope="col">Company</th>
+            <th scope="col">Status</th>
+            {# <th scope="col">Time</th> #}
+            <th scope="col">Qualified</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for interview in interviews[i] %}
+                <tr>
+                    <th scope="row"> {{ interview.pos_id }} </th>
+                    <td> {{ interview.position.role }} </td>
+                    <td> {{ interview.position.company_name }} </td>
+                    <td> {{ interview.status }} </td>
+                    {# <td> {{ interview.time }} </td> #}
+                    <td> {{ interview.qualified }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+{% endfor %}
+{% endblock %}
+
