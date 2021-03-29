@@ -112,6 +112,9 @@ def studentInterviews():
     for interview in all_interviews: 
         interview.position = Position.query.get(interview.pos_id)
     
+    for sel_interview in selections: 
+        sel_interview.position = Position.query.get(sel_interview.pos_id)
+        
     max_rounds = max([interview.round for interview in all_interviews])
 
     return render_template('student_interviews.j2', interviews = all_interviews, selections = selections, max_rounds = max_rounds)
@@ -153,8 +156,11 @@ def hrInterview(pos_id):
         interview.student = Student.query.filter_by(roll_no = interview.roll_no).first()
 
     position.interviews = all_interviews
-    qualified = [inter for inter in all_interviews if (inter.qualified == True) and (inter.round == position.num_rounds)]
 
+    qualified = [inter for inter in all_interviews if (inter.qualified == True) and (inter.round == position.num_rounds)]
+    for qual_interview in qualified: 
+        qual_interview.student = Student.query.filter_by(roll_no = qual_interview.roll_no).first()
+    
     if not all_interviews:
         max_rounds = 1
     else:
@@ -247,13 +253,13 @@ def getShortlistedAndPlaced(dep_code):
     placed = Student.query.filter((Student.dep_code == dep_code) & (selected_pos_id != None )).all().length
     shortlisted = Student.query.filter(Student.dep_code == dep_code).\
         filter((Interview.roll_no == Student.roll_no) & (Interview.pos_id == Student.pos_id) &\
-            (Interview.round == Position.num_rounds))
+            (Interview.round == Position.num_rounds)).all().length
     return (placed, shortlisted)
 
 @login_required
 @app.route('/dep_statistics') 
 def depStatistics(): 
-    if current_user.user_type not in ['dep'] : 
+    if current_user.user_type not in ['deprep'] : 
         return redirect('/')
 
     dep = Department.query.filter((Student.username == current_user.username) & (Student.dep_code == Department.dep_code) ).first()

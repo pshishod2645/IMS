@@ -49,7 +49,31 @@
     </table>
     <br>
 {% endfor %}
-
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th colspan="6" class="text-center">Selected Students</th>
+        </tr>
+        <tr>
+            <th scope="col">Student Roll Number</th>
+            <th scope="col">Student IMS Username</th>
+            <th scope="col">Acceptance</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for interview in qualified %}
+                <tr>
+                    <th scope="row"> {{ interview.student.roll_no }} </th>
+                    <td> {{ interview.student.username }} </td>
+                    <td>
+                    {% if interview.student.selected_pos_id is not none%}
+                        {% if interview.student.selected_pos_id == position.pos_id %}Accepted{% else %}Rejected{% endif %}
+                    {% else %}Pending{% endif %}
+                    </td>
+                </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% block javascript %}
 <script>
 document.getElementById("cancelbtn").disabled = true;

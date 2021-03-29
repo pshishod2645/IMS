@@ -13,10 +13,8 @@ function drawBasic() {
 
      var data = google.visualization.arrayToDataTable([
         ["Element", "Density", { role: "style" } ],
-        ["Copper", 8, 'color: #76A7FA'],
-        ["Silver", 0, "silver"],
-        ["Gold", 19.30, "gold"],
-        ["Platinum", 21.45, "color: #e5e4e2"]
+        ["Students Placed", {{ dep.placed }}, 'color: #76A7FA'],
+        ["Students Shortlisted", {{ dep.shortlisted }}, 'color: #76A7FA']
       ]);
 
       var options = {
