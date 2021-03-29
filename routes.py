@@ -115,7 +115,7 @@ def hrPositions():
 
     positions = Position.query.filter( (Position.company_name == HR.company_name) & (HR.username == current_user.username)).all()
 
-    return render_template('hr_positions.j2', positions = positions)
+    return render_template('hr_positions.j2', positions = positions, company_name = "amazon")
 
 @app.route('/hr/position/<int:pos_id>')
 @login_required
@@ -123,10 +123,10 @@ def hrInterview(pos_id):
     position = Position.query.get(pos_id)
     all_interviews = Interview.query.filter_by(pos_id = pos_id).all()
     for interview in all_interviews: 
-        interview.student = Student.query.filter_by(roll_no = nterview.roll_no).first()
+        interview.student = Student.query.filter_by(roll_no = interview.roll_no).first()
 
     position.interviews = all_interviews
-    qualified = [inter for inter in interviews if (inter.qualified == True) and (inter.round = position.num_rounds)]
+    qualified = [inter for inter in interviews if (inter.qualified == True) and (inter.round == position.num_rounds)]
 
     return render_template('hr_interview.j2', position = positions, qualified = qualified) 
 
