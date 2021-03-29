@@ -115,17 +115,28 @@ def hrPositions():
 
     positions = Position.query.filter( (Position.company_name == HR.company_name) & (HR.username == current_user.username)).all()
 
-    for position in positions: 
-        position.students = Student.query.filter((Student.roll_no == ApplyToPosition.roll_no) & \
-            (ApplyToPosition.pos_id == position.pos_id)).all()
-
     return render_template('hr_positions.j2', positions = positions)
 
+@app.route('/hr/position/<int:pos_id>')
 @login_required
+def hrInterview(pos_id): 
+    position = Position.query.get(pos_id)
+    all_interviews = Interview.query.filter_by(pos_id = pos_id).all()
+    for interview in all_interviews: 
+        interview.student = Student.query.filter_by(roll_no = nterview.roll_no).first()
+
+    qualified = [inter for inter in interviews if (inter.qualified == True) and (inter.round = position.num_rounds)]
+    interviews = [[]] * (position.num_rounds)
+    for interview in all_interviews: 
+        interviews[interview.round - 1].append(interview)
+
+    position.interviews = interviews
+    return render_template('hr_interview.j2', position = positions, qualified = qualified) 
+
 @app.route('/hr/<int:pos_id>/<string:roll_no>/<int:round>/modify', methods = ['POST'])
-def approveOrRejectForPosition(): 
+def approveOrRejectForPosition(pos_id, roll_no, round): 
     if current_user.user_type not in ['hr'] : 
-        return redirect('/')
+        return Response(status = 201)
     
     status = request.args.get('status')
     qualified = request.args.get('qualified', type = bool)
@@ -170,7 +181,10 @@ def studentInterviews():
 
     student = Student.query.get(current_user.username)
     all_interviews = Interview.query.filter_by(roll_no = student.roll_no).all()
-
+    selections = Interview.query.filter((Position.pos_id == Interview.pos_id) & \
+        (Position.num_rounds == Interview.round) & (Interview.roll_no == student.roll_no) & \
+            (Interview.qualified == True) ) 
+    
     if len(all_interviews) == 0 : 
         return render_template('students_interviews.j2', interviews = [])
 
@@ -182,4 +196,22 @@ def studentInterviews():
     for interview in all_interviews : 
         interviews[interview.round - 1].append(interview)
 
-    return render_template('student_interviews.j2', interviews = interviews)
+    return render_template('student_interviews.j2', interviews = interviews, selections = selections)
+
+@login_required
+@app.route('/student/select/<int:pos_id>', methods = ['POST'])
+def selectPosition(pos_id): 
+    if current_user not in ['student', 'placecom', 'deprep']: 
+        return Response(status = 201)
+    
+    student = Student.query.get(current_user.username)
+    if student.selected_pos_id : 
+        return Response(status = 201)
+    try : 
+        student.selected_pos_id = pos_id
+        db.session.add(student)
+        db.session.commit()
+    except: 
+        print('Database fucked up or Invalid Data')
+        return Response(status = 201)
+    return Response(status = 200)
