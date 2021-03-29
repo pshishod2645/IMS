@@ -87,7 +87,7 @@ def applyToPosition(pos_id):
         interview.roll_no = student.roll_no
         interview.pos_id = pos_id
         interview.round = 1
-
+        interview.status = 'pending'
         db.session.add(interview), db.session.commit()
     except:
         print('Database fuckedup or invalid data') 
@@ -95,17 +95,47 @@ def applyToPosition(pos_id):
     return Response(status = 200)
 
 @login_required
-@app.route('/dep_statistics') 
-def depStatistics(): 
-    if current_user.user_type not in ['dep'] : 
+@app.route('/student/interviews')
+def studentInterviews(): 
+    if current_user.user_type not in ['placecom', 'student', 'deprep'] : 
         return redirect('/')
 
-    dep = Department.query.filter((Student.username == 'ankit.karn') & (Student.dep_code == Department.dep_code) ).first()
-    try: 
-        assert dep is not None
+    student = Student.query.get(current_user.username)
+    all_interviews = Interview.query.filter_by(roll_no = student.roll_no).all()
+    selections = Interview.query.filter((Position.pos_id == Interview.pos_id) & \
+        (Position.num_rounds == Interview.round) & (Interview.roll_no == student.roll_no) & \
+            (Interview.qualified == True) ) 
+    
+    if len(all_interviews) == 0 : 
+        return render_template('student_interviews.j2', interviews = [], selections = selections, max_rounds = 1, student = student)
+
+    for interview in all_interviews: 
+        interview.position = Position.query.get(interview.pos_id)
+    
+    for sel_interview in selections: 
+        sel_interview.position = Position.query.get(sel_interview.pos_id)
+
+    max_rounds = max([interview.round for interview in all_interviews])
+
+    return render_template('student_interviews.j2', interviews = all_interviews, selections = selections, max_rounds = max_rounds, student = student)
+
+@login_required
+@app.route('/student/select/<int:pos_id>', methods = ['POST'])
+def selectPosition(pos_id): 
+    if current_user.user_type not in ['student', 'placecom', 'deprep']: 
+        return Response(status = 201)
+    
+    student = Student.query.get(current_user.username)
+    if student.selected_pos_id : 
+        return Response(status = 201)
+    try : 
+        student.selected_pos_id = pos_id
+        db.session.add(student)
+        db.session.commit()
     except: 
-        return 'No Department found! Inconsistencies in Database'
-    return render_template('dep_statistics.j2', dep = dep)
+        print('Database fucked up or Invalid Data')
+        return Response(status = 201)
+    return Response(status = 200)
 
 @login_required
 @app.route('/hr/positions')
@@ -115,17 +145,34 @@ def hrPositions():
 
     positions = Position.query.filter( (Position.company_name == HR.company_name) & (HR.username == current_user.username)).all()
 
-    for position in positions: 
-        position.students = Student.query.filter((Student.roll_no == ApplyToPosition.roll_no) & \
-            (ApplyToPosition.pos_id == position.pos_id)).all()
+    return render_template('hr_positions.j2', positions = positions, company_name = "amazon")
 
-    return render_template('hr_positions.j2', positions = positions)
+@login_required
+@app.route('/hr/position/<int:pos_id>')
+def hrInterview(pos_id): 
+    position = Position.query.get(pos_id)
+    all_interviews = Interview.query.filter_by(pos_id = pos_id).all()
+    for interview in all_interviews: 
+        interview.student = Student.query.filter_by(roll_no = interview.roll_no).first()
+
+    position.interviews = all_interviews
+
+    qualified = [inter for inter in all_interviews if (inter.qualified == True) and (inter.round == position.num_rounds)]
+    for qual_interview in qualified: 
+        qual_interview.student = Student.query.filter_by(roll_no = qual_interview.roll_no).first()
+    
+    if not all_interviews:
+        max_rounds = 1
+    else:
+        max_rounds = max([interview.round for interview in all_interviews])
+
+    return render_template('hr_interview.j2', position = position, qualified = qualified, max_rounds = max_rounds) 
 
 @login_required
 @app.route('/hr/<int:pos_id>/<string:roll_no>/<int:round>/modify', methods = ['POST'])
-def approveOrRejectForPosition(): 
+def approveOrRejectForPosition(pos_id, roll_no, round): 
     if current_user.user_type not in ['hr'] : 
-        return redirect('/')
+        return Response(status = 201)
     
     status = request.args.get('status')
     qualified = request.args.get('qualified', type = bool)
@@ -156,6 +203,7 @@ def approveOrRejectForPosition():
             next_interview = Interview()
             next_interview.round = interview.round + 1 
             next_interview.pos_id, next_interview.roll_no = interview.pos_id, interview.roll_no
+            next_interview.status = 'pending'
             db.session.add(next_interview)
         db.session.commit()
         return Response(status = 200) 
@@ -163,23 +211,62 @@ def approveOrRejectForPosition():
     return Response(status = 201)
 
 @login_required
-@app.route('/student/interviews')
-def studentInterviews(): 
-    if current_user.user_type not in ['placecom', 'student', 'deprep'] : 
+@app.route('/hr/createPosition', methods = ['GET', 'POST'])
+def createPosition(): 
+    if current_user.user_type not in ['hr']: 
+        return Response(status = 201)
+    # role, description, company_name, cgpa_cutoff, location, num_rounds
+    if request.method == 'POST' : 
+        form = request.form
+        hr = HR.query.get(current_user.username) 
+
+        pos = Position()
+        pos.role = form.get('role', type = str)
+        pos.description = form.get('description', type = str)
+        pos.cgpa_cutoff = form.get('cgpa_cutoff', type = float)
+        pos.location = form.get('location', type = str)
+        pos.num_rounds = form.get('num_rounds', type = int)
+        pos.company_name = hr.company_name
+
+        db.session.add(pos)
+        db.session.commit()
+
+        return redirect('/hr/positions')
+    return render_template('hr_positions.j2')
+
+
+## PLACECOM ROUTES START HERE
+@login_required
+@app.route('/allInterviews')
+def allInterviews(): 
+    if current_user.user_type not in ['placecom']: 
+        return redirect('/')
+    
+    interviews = Interview.query.all()
+    for interview in interviews: 
+        interview.student = Student.query.filter_by(roll_no = interview.roll_no)
+
+    return render_template('allInterviews.j2', interviews = interviews)
+
+
+def getShortlistedAndPlaced(dep_code): 
+    placed = Student.query.filter((Student.dep_code == dep_code) & (selected_pos_id != None )).all().length
+    shortlisted = Student.query.filter(Student.dep_code == dep_code).\
+        filter((Interview.roll_no == Student.roll_no) & (Interview.pos_id == Student.pos_id) &\
+            (Interview.round == Position.num_rounds)).all().length
+    return (placed, shortlisted)
+
+@login_required
+@app.route('/dep_statistics') 
+def depStatistics(): 
+    if current_user.user_type not in ['deprep'] : 
         return redirect('/')
 
-    student = Student.query.get(current_user.username)
-    all_interviews = Interview.query.filter_by(roll_no = student.roll_no).all()
-
-    if len(all_interviews) == 0 : 
-        return render_template('students_interviews.j2', interviews = [])
-
-    for interview in all_interviews: 
-        interview.position = Position.query.get(interview.pos_id)
-    
-    max_rounds = max([interview.round for interview in all_interviews])
-    interviews = [[]] * max_rounds
-    for interview in all_interviews : 
-        interviews[interview.round - 1].append(interview)
-
-    return render_template('student_interviews.j2', interviews = interviews)
+    dep = Department.query.filter((Student.username == current_user.username) & (Student.dep_code == Department.dep_code) ).first()
+    try: 
+        assert dep is not None
+        dep.placed, dep.shortlisted = getShortlistedAndPlaced(dep.dep_code)
+        db.session.commit()
+    except: 
+        return 'No Department found! Inconsistencies in Database'
+    return render_template('dep_statistics.j2', dep = dep)

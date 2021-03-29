@@ -1,0 +1,142 @@
+{% extends 'base.j2' %}
+{% block content %}
+<h4 class="mt-3 ml-3"> Interviews for role {{ position.role }}, id: {{ position.pos_id }} <button class="btn btn-outline-dark float-right" onclick="cancel()"id="cancelbtn">Cancel</button></h4>
+{% for i in range(1, max_rounds+1) %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+            <th colspan="6" class="text-center">Round {{ i }}</th>
+            </tr>
+            <tr>
+            <th scope="col">Student Roll Number</th>
+            <th scope="col">Student IMS Username</th>
+            <th scope="col">Status</th>
+            {# <th scope="col">Time</th> #}
+            <th scope="col">Qualified</th>
+            <th scope="col">Update Status</th>
+            <th scope="col">Update Qualified</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for interview in position.interviews %}
+                {% if interview.round == i %}
+                <tr>
+                    <th scope="row"> {{ interview.student.roll_no }} </th>
+                    <td> {{ interview.student.username }} </td>
+                    <td id = "status_{{ interview.student.roll_no }}_{{ i }}"> {{ interview.status }} </td>
+                    <td id = "qualified_{{ interview.student.roll_no }}_{{ i }}">
+                    {% if interview.qualified is not none%}
+                        {% if interview.qualified == 1 %}Qualified{% else %}Not Qualified{% endif %}
+                    {% else %} 
+                    {{ interview.qualified }} 
+                    {% endif %}
+                    </td>
+                    {# <td> {{ interview.time }} </td> #}
+                    <td> 
+                        <button id="update_status_{{ interview.student.roll_no }}_{{ i }}" 
+                         onclick='update_status({{ interview.student.roll_no | tojson() }},{{ i }})' type="button" 
+                         class="btn btn-outline-dark">Update</button>
+                    </td>
+                    <td> 
+                        <button id="update_qualified_{{ interview.student.roll_no }}_{{ i }}" 
+                         onclick='update_qualified({{ interview.student.roll_no | tojson() }},{{ i }})' type="button" 
+                         class="btn btn-outline-dark">Update</button>
+                    </td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+{% endfor %}
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th colspan="6" class="text-center">Selected Students</th>
+        </tr>
+        <tr>
+            <th scope="col">Student Roll Number</th>
+            <th scope="col">Student IMS Username</th>
+            <th scope="col">Acceptance</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for interview in qualified %}
+                <tr>
+                    <th scope="row"> {{ interview.student.roll_no }} </th>
+                    <td> {{ interview.student.username }} </td>
+                    <td>
+                    {% if interview.student.selected_pos_id is not none%}
+                        {% if interview.student.selected_pos_id == position.pos_id %}Accepted{% else %}Rejected{% endif %}
+                    {% else %}Pending{% endif %}
+                    </td>
+                </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% block javascript %}
+<script>
+document.getElementById("cancelbtn").disabled = true;
+function update_status(roll_no, round) {
+  document.getElementById("cancelbtn").disabled = false;
+  var status_cell = document.getElementById("status_"+roll_no+"_"+round);  
+  var status_button = document.getElementById("update_status_"+roll_no+"_"+round);
+  var qualified_button = document.getElementById("update_qualified_"+roll_no+"_"+round);
+  qualified_button.disabled = true;
+  if(status_button.innerText == "Update") {
+      status_button.innerText = "Confirm";
+      status_cell.innerHTML = '<select class="form-control" id="newstatus" required><option value = "pending">pending</option><option value = "scheduled">scheduled</option><option value = "ongoing">ongoing</option><option value = "done">done</option></select>';
+  } else {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+          console.log(this.status);
+          if (this.readyState == 4 && this.status == 200) {
+              window.location.reload();
+          } else if(this.readyState == 4){
+              status_button.innerText = "Failed";
+              setTimeout(function(){
+                  window.location.reload();
+              }, 3000);
+          }
+      };
+      xhttp.open("POST", "/hr/" + {{ position.pos_id }} + "/" + roll_no + "/" + round + "/modify?status="+document.getElementById("newstatus").value, true);
+      xhttp.send();
+  }
+}
+
+function update_qualified(roll_no, round) {
+  document.getElementById("cancelbtn").disabled = false;
+  var qual_cell = document.getElementById("qualified_"+roll_no+"_"+round);  
+  var status_button = document.getElementById("update_status_"+roll_no+"_"+round);
+  var qualified_button = document.getElementById("update_qualified_"+roll_no+"_"+round);
+  status_button.disabled = true;
+  if(qualified_button.innerText == "Update") {
+      qualified_button.innerText = "Confirm";
+      qual_cell.innerHTML = 
+      '<select class="form-control" id="newqual" required><option value = "True">Qualified</option><option value = "False">Not Qualified</option></select>';
+  } else {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+          console.log(this.status);
+          if (this.readyState == 4 && this.status == 200) {
+              window.location.reload();
+          } else if(this.readyState == 4){
+              qualified_button.innerText = "Failed";
+              setTimeout(function(){
+                  window.location.reload();
+              }, 3000);
+          }
+      };
+      xhttp.open("POST", "/hr/" + {{ position.pos_id }} + "/" + roll_no + "/" + round + "/modify?qualified="+document.getElementById("newqual").value, true);
+      xhttp.send();
+  }
+}
+
+function cancel() {
+    window.location.reload();
+}
+</script>
+{% endblock %}
+
+{% endblock %}
+

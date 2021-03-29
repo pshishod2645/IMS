@@ -1,35 +1,31 @@
 {% extends 'base.j2' %}
 {% block content %}
 
-<canvas id="myChart"></canvas>
+<div id="chart_div"></div>
 
 {% block javascript %}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
-var ctx = document.getElementById('myChart').getContext('2d');
-var chart = new Chart(ctx, {
-    // The type of chart we want to create
-    type: 'bar',
+google.charts.load('current', {packages: ['corechart', 'bar']});
+google.charts.setOnLoadCallback(drawBasic);
 
-    // The data for our dataset
-    data: {
-        labels: ['Students Shortlisted', 'Students Placed'],
-        datasets: [{
-            label: 'Placement Statistics',
-            barThickness: 8,
-            maxBarThickness: 8,
-            backgroundColor: 'rgb(255, 99, 132)',
-            borderColor: 'rgb(255, 99, 132)',
-            data: [ {{ dep.students_shortlisted }} , {{ dep.students_placed }} ]
-        }]
-    },
+function drawBasic() {
 
-    // Configuration options go here
-    options: {
-        layout: {
-            padding: 25
-        }        
-    }
-});
+     var data = google.visualization.arrayToDataTable([
+        ["Element", "Density", { role: "style" } ],
+        ["Students Placed", {{ dep.placed }}, 'color: #76A7FA'],
+        ["Students Shortlisted", {{ dep.shortlisted }}, 'color: #76A7FA']
+      ]);
+
+      var options = {
+        title: 'Placement Statistics'
+      };
+
+      var chart = new google.visualization.ColumnChart(
+        document.getElementById('chart_div'));
+
+      chart.draw(data, options);
+}
 </script>
 {% endblock %}
 
