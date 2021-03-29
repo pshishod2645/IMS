@@ -142,7 +142,7 @@ def hrPositions():
 
     positions = Position.query.filter( (Position.company_name == HR.company_name) & (HR.username == current_user.username)).all()
 
-    return render_template('hr_positions.j2', positions = positions)
+    return render_template('hr_positions.j2', positions = positions, company_name = "amazon")
 
 @login_required
 @app.route('/hr/position/<int:pos_id>')
@@ -150,7 +150,7 @@ def hrInterview(pos_id):
     position = Position.query.get(pos_id)
     all_interviews = Interview.query.filter_by(pos_id = pos_id).all()
     for interview in all_interviews: 
-        interview.student = Student.query.filter_by(roll_no = nterview.roll_no).first()
+        interview.student = Student.query.filter_by(roll_no = interview.roll_no).first()
 
     position.interviews = all_interviews
     qualified = [inter for inter in interviews if (inter.qualified == True) and (inter.round == position.num_rounds)]
@@ -218,8 +218,8 @@ def createPosition():
         db.session.add(pos)
         db.session.commit()
 
-        return redirect('/hr/position/' + str(pos.pos_id))
-    return render_template('create_position.j2')
+        return redirect('/hr/positions/')
+    return render_template('hr_positions.j2')
 
 
 ## PLACECOM ROUTES START HERE

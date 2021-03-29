@@ -1,12 +1,77 @@
 {% extends 'base.j2' %}
 {% block content %}
+<h4 class="mt-3 ml-3"> Positions at {{ company_name }} <button class="btn btn-outline-dark float-right" id="add" data-toggle="collapse" data-target="#addpos">Add Position</button></h4>
+<form action="hr/createPosition" method="post" id="addpos" class="collapse mt-3 ml-3 col-sm-6">
+    <div class="form-group">
+	      <label for="role">Role</label>
+	      <input type="text" class="form-control" id="role" name="role" placeholder="Enter role" required>
+    </div>
+    <div class="form-group">
+	      <label for="role">Description</label>
+	      <input type="text" class="form-control" id="description" name="description" placeholder="Enter description" required>
+    </div>
+    <div class="form-group">
+	      <label for="cgpa_cutoff">CGPA Cutoff</label>
+	      <input type="number" class="form-control" id="cgpa_cutoff" name="cgpa_cutoff" min="0" step="0.01" max="10" placeholder="Enter cgpa cutoff" required>
+    </div>
+    <div class="form-group">
+	      <label for="location">Location</label>
+	      <input type="text" class="form-control" id="location" name="location" placeholder="Enter location" required>
+    </div>
+	<div class="form-group">
+	      <label for="num_rounds">Number of Rounds</label>
+	      <input type="number" class="form-control" id="num_rounds" name="num_rounds" min="1" step="1" placeholder="Enter number of rounds" required>
+    </div>
+    <div>
+      <button type="submit" class="btn btn-outline-dark">Submit</button>
+    </div>
+    <br>
+</form>
+<table class="table table-hover">
+    <thead>
+        <tr>
+        <th scope="col">Position ID</th>
+        <th scope="col">Role</th>
+        <th scope="col">CGPA Cutoff</th>
+        <th scope="col">Location</th>
+        <th scope="col">Number of Rounds</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pos in positions %}
+            <tr data-toggle="collapse" data-target="#desc_{{ pos.pos_id }}" class="clickable">
+                <th scope="row"> {{ pos.pos_id }} </th>
+                <td> {{ pos.role }} </td>
+                <td> {{ pos.cgpa_cutoff }} </td>
+                <td> {{ pos.location }}</td>
+                <td> {{ pos.num_rounds }} </td>
+            </tr>
+            <tr>
+			    <td colspan="6" style="padding:0;">
+			        <div class="collapse" id="desc_{{ pos.pos_id }}">
+			        	Position description: {{ pos.description }}
+			    	</div>
+			    </td>
+			</tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% block javascript %}
+<script>
 
-<a role = "button" class = "btn btn-info" href = "/hr/createPosition">Create New Position</a> 
-{% for position in positions %}
-    {{position.pos_id}}, Students - 
-    {% for student in position.students %}
-    {{ student.roll_no }}
-    {% endfor %}
-{% endfor %}
+$("#add").click(function(){
+	if($("#add").text()=="Add Position"){
+    	$("#add").text("Cancel");
+    } else {
+    	cancel();
+    }
+});
+
+function cancel(){
+	window.location.reload();
+}
+</script>
+{% endblock %}
 
 {% endblock %}
+
