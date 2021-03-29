@@ -53,3 +53,13 @@ def signup():
 def logout(): 
     logout_user()
     return redirect('/')
+
+@login_required
+@app.route('/profile')
+def profile(): 
+    person = None
+    if current_user.user_type in ['student', 'deprep', 'placecom'] : 
+        person = Student.query.get(current_user.username)
+    else : 
+        person = HR.query.get(current_user.username)
+    return render_template('User/profile.j2', person = person)
