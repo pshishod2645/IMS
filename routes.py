@@ -107,7 +107,7 @@ def studentInterviews():
             (Interview.qualified == True) ) 
     
     if len(all_interviews) == 0 : 
-        return render_template('student_interviews.j2', interviews = [])
+        return render_template('student_interviews.j2', interviews = [], selections = selections, max_rounds = 1)
 
     for interview in all_interviews: 
         interview.position = Position.query.get(interview.pos_id)
@@ -119,7 +119,7 @@ def studentInterviews():
 @login_required
 @app.route('/student/select/<int:pos_id>', methods = ['POST'])
 def selectPosition(pos_id): 
-    if current_user not in ['student', 'placecom', 'deprep']: 
+    if current_user.user_type not in ['student', 'placecom', 'deprep']: 
         return Response(status = 201)
     
     student = Student.query.get(current_user.username)
@@ -155,7 +155,10 @@ def hrInterview(pos_id):
     position.interviews = all_interviews
     qualified = [inter for inter in all_interviews if (inter.qualified == True) and (inter.round == position.num_rounds)]
 
-    max_rounds = max([interview.round for interview in all_interviews])
+    if not all_interviews:
+        max_rounds = 1
+    else:
+        max_rounds = max([interview.round for interview in all_interviews])
 
     return render_template('hr_interview.j2', position = position, qualified = qualified, max_rounds = max_rounds) 
 
@@ -204,7 +207,7 @@ def approveOrRejectForPosition(pos_id, roll_no, round):
 @login_required
 @app.route('/hr/createPosition', methods = ['GET', 'POST'])
 def createPosition(): 
-    if current_user not in ['hr']: 
+    if current_user.user_type not in ['hr']: 
         return Response(status = 201)
     # role, description, company_name, cgpa_cutoff, location, num_rounds
     if request.method == 'POST' : 
@@ -217,11 +220,12 @@ def createPosition():
         pos.cgpa_cutoff = form.get('cgpa_cutoff', type = float)
         pos.location = form.get('location', type = str)
         pos.num_rounds = form.get('num_rounds', type = int)
+        pos.company_name = hr.company_name
 
         db.session.add(pos)
         db.session.commit()
 
-        return redirect('/hr/positions/')
+        return redirect('/hr/positions')
     return render_template('hr_positions.j2')
 
 
