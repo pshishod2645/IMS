@@ -65,7 +65,7 @@ def studentPositions():
         return redirect('/')
 
     student = Student.query.filter_by(username = current_user.username).first()
-    appliedPositions = ApplyToPosition.query.filter_by(roll_no = student.roll_no).all()
+    appliedPositions = Interview.query.filter_by(roll_no = student.roll_no, round = 1).all()
     appliedPositions = [a2P.pos_id for a2P in appliedPositions]
     assert student is not None
 
@@ -83,11 +83,12 @@ def applyToPosition(pos_id):
     
     try : 
         student = Student.query.filter_by(username = current_user.username).first()
-        a2P = ApplyToPosition()
-        a2P.roll_no = student.roll_no
-        a2P.pos_id = pos_id
+        interview = Interview()
+        interview.roll_no = student.roll_no
+        interview.pos_id = pos_id
+        interview.round = 1
 
-        db.session.add(a2P), db.session.commit()
+        db.session.add(interview), db.session.commit()
     except:
         print('Database fuckedup or invalid data') 
         return Response(status = 201)
@@ -109,7 +110,7 @@ def depStatistics():
 @login_required
 @app.route('/hr/positions')
 def hrPositions():
-    if current_user.user_type not in     ['hr']: 
+    if current_user.user_type not in ['hr']: 
         return redirect('/')
 
     positions = Position.query.filter( (Position.company_name == HR.company_name) & (HR.username == current_user.username)).all()
@@ -121,12 +122,64 @@ def hrPositions():
     return render_template('hr_positions.j2', positions = positions)
 
 @login_required
-@app.route('/hr/<int:pos_id>/shcedule/<str:roll_no>')
+@app.route('/hr/<int:pos_id>/<string:roll_no>/<int:round>/modify', methods = ['POST'])
 def approveOrRejectForPosition(): 
     if current_user.user_type not in ['hr'] : 
         return redirect('/')
     
-    interview = Interview()
-    interview.pos_id = pos_id
-    return 'hello'
+    status = request.args.get('status')
+    qualified = request.args.get('qualified', type = bool)
+
+    position = Position.query.filter_by(pos_id = pos_id).first()
+    interview = Interview.query.filter_by(pos_id = pos_id, roll_no = roll_no, round = round).first()
+    assert (position is not None) and (interview is not None)
+
+    options = ['pending', 'scheduled', 'ongoing', 'done']
+    if (status is not None) and (status in options) : 
+        # can only move status forward
+        if options.index(status) <= options.index(interview.status):
+            print('Cant change status from {interview.status} to {status}') 
+            return Response(status = 201)
+        interview.status = status
+        db.session.commit()
+        return Response(status = 200)
     
+    if (qualified is not None): 
+        if interview.qualified == True : 
+            print('Cant change qualified status from {interview.qualified} to {qualified}')
+            return Response(status = 201)
+
+        interview.qualified = qualified 
+        db.session.add(interview)
+
+        if interview.round != position.num_rounds : 
+            next_interview = Interview()
+            next_interview.round = interview.round + 1 
+            next_interview.pos_id, next_interview.roll_no = interview.pos_id, interview.roll_no
+            db.session.add(next_interview)
+        db.session.commit()
+        return Response(status = 200) 
+    print('Nothing to change') 
+    return Response(status = 201)
+
+@login_required
+@app.route('/student/interviews')
+def studentInterviews(): 
+    if current_user.user_type not in ['placecom', 'student', 'deprep'] : 
+        return redirect('/')
+
+    student = Student.query.get(current_user.username)
+    all_interviews = Interview.query.filter_by(roll_no = student.roll_no).all()
+
+    if len(all_interviews) == 0 : 
+        return render_template('students_interviews.j2', interviews = [])
+
+    for interview in all_interviews: 
+        interview.position = Position.query.get(interview.pos_id)
+    
+    max_rounds = max([interview.round for interview in all_interviews])
+    interviews = [[]] * max_rounds
+    for interview in all_interviews : 
+        interviews[interview.round - 1].append(interview)
+
+    return render_template('student_interviews.j2', interviews = interviews)
