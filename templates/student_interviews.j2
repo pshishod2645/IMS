@@ -24,7 +24,13 @@
                     <td> {{ interview.position.company_name }} </td>
                     <td> {{ interview.status }} </td>
                     {# <td> {{ interview.time }} </td> #}
-                    <td> {{ interview.qualified }}</td>
+                    <td>                    
+                    {% if interview.qualified is not none%}
+                        {% if interview.qualified == 1 %}Qualified{% else %}Not Qualified{% endif %}
+                    {% else %} 
+                    {{ interview.qualified }} 
+                    {% endif %}
+                    </td>
                 </tr>
                 {% endif %}
             {% endfor %}

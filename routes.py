@@ -114,7 +114,7 @@ def studentInterviews():
     
     max_rounds = max([interview.round for interview in all_interviews])
 
-    return render_template('student_interviews.j2', interviews = interviews, selections = selections, max_rounds = max_rounds)
+    return render_template('student_interviews.j2', interviews = all_interviews, selections = selections, max_rounds = max_rounds)
 
 @login_required
 @app.route('/student/select/<int:pos_id>', methods = ['POST'])
@@ -194,6 +194,7 @@ def approveOrRejectForPosition(pos_id, roll_no, round):
             next_interview = Interview()
             next_interview.round = interview.round + 1 
             next_interview.pos_id, next_interview.roll_no = interview.pos_id, interview.roll_no
+            next_interview.status = 'pending'
             db.session.add(next_interview)
         db.session.commit()
         return Response(status = 200) 

@@ -24,7 +24,13 @@
                     <th scope="row"> {{ interview.student.roll_no }} </th>
                     <td> {{ interview.student.username }} </td>
                     <td id = "status_{{ interview.student.roll_no }}_{{ i }}"> {{ interview.status }} </td>
-                    <td id = "qualified_{{ interview.student.roll_no }}_{{ i }}"> {{ interview.qualified }} </td>
+                    <td id = "qualified_{{ interview.student.roll_no }}_{{ i }}">
+                    {% if interview.qualified is not none%}
+                        {% if interview.qualified == 1 %}Qualified{% else %}Not Qualified{% endif %}
+                    {% else %} 
+                    {{ interview.qualified }} 
+                    {% endif %}
+                    </td>
                     {# <td> {{ interview.time }} </td> #}
                     <td> 
                         <button id="update_status_{{ interview.student.roll_no }}_{{ i }}" 
