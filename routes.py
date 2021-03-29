@@ -107,17 +107,17 @@ def studentInterviews():
             (Interview.qualified == True) ) 
     
     if len(all_interviews) == 0 : 
-        return render_template('student_interviews.j2', interviews = [], selections = selections, max_rounds = 1)
+        return render_template('student_interviews.j2', interviews = [], selections = selections, max_rounds = 1, student = student)
 
     for interview in all_interviews: 
         interview.position = Position.query.get(interview.pos_id)
     
     for sel_interview in selections: 
         sel_interview.position = Position.query.get(sel_interview.pos_id)
-        
+
     max_rounds = max([interview.round for interview in all_interviews])
 
-    return render_template('student_interviews.j2', interviews = all_interviews, selections = selections, max_rounds = max_rounds)
+    return render_template('student_interviews.j2', interviews = all_interviews, selections = selections, max_rounds = max_rounds, student = student)
 
 @login_required
 @app.route('/student/select/<int:pos_id>', methods = ['POST'])
