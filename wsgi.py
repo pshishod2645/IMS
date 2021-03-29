@@ -17,7 +17,7 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
 
-from routes import * 
+from routes.routes import * 
 if __name__ == '__main__' : 
     app.secret_key = os.urandom(12)
     app.run(debug = True)
