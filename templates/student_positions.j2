@@ -19,10 +19,15 @@
                 <td> {{ pos.company_name }} </td>
                 <td> {{ pos.cgpa_cutoff }} </td>
                 <td> {{ pos.location }}</td>
-                <td> 
-                <button id="apply_{{ pos.pos_id }}" onclick="apply(event, {{ pos.pos_id }})" type="button"
-                class="btn btn-outline-dark">Apply</button>
-                </td>
+                <td>
+                {% if pos.applied %}
+                  <button id="apply_{{ pos.pos_id }}" type="button"
+                  class="btn btn-outline-dark" disabled>Applied</button>
+                {% else %}
+                  <button id="apply_{{ pos.pos_id }}" onclick="apply(event, {{ pos.pos_id }})" type="button"
+                  class="btn btn-outline-dark">Apply</button>
+                {% endif %}
+              </td>
             </tr>
             <tr>
 			    <td colspan="6" style="padding:0;">
@@ -44,13 +49,15 @@ function apply(event, pos_id) {
   xhttp.onreadystatechange = function() {
       console.log(this.status);
     if (this.readyState == 4 && this.status == 200) {
-        apply_button.innerHTML = "Applied";
-    } else {
-        apply_button.innerHTML = "Failed";
+        apply_button.innerText = "Applied";
+    } else if(this.readyState == 4){
+        apply_button.innerText = "Failed";
+        setTimeout(function(){
+            apply_button.innerText = "Apply"
+            apply_button.disabled = false;
+        }, 3000);
     }
   };
-  console.log(pos_id, typeof(pos_id));
-  apply_button.value = "Applied";
   xhttp.open("POST", "/student/apply_to_position/" + pos_id, true);
   xhttp.send();
 }
