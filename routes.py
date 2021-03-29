@@ -100,7 +100,7 @@ def depStatistics():
     if current_user.user_type not in ['dep'] : 
         return redirect('/')
 
-    dep = Department.query.filter((Student.username == 'ankit.karn') & (Student.dep_code == Department.dep_code) ).first()
+    dep = Department.query.filter((Student.username == current_user.username) & (Student.dep_code == Department.dep_code) ).first()
     try: 
         assert dep is not None
     except: 
@@ -125,12 +125,9 @@ def hrInterview(pos_id):
     for interview in all_interviews: 
         interview.student = Student.query.filter_by(roll_no = nterview.roll_no).first()
 
+    position.interviews = all_interviews
     qualified = [inter for inter in interviews if (inter.qualified == True) and (inter.round = position.num_rounds)]
-    interviews = [[]] * (position.num_rounds)
-    for interview in all_interviews: 
-        interviews[interview.round - 1].append(interview)
 
-    position.interviews = interviews
     return render_template('hr_interview.j2', position = positions, qualified = qualified) 
 
 @app.route('/hr/<int:pos_id>/<string:roll_no>/<int:round>/modify', methods = ['POST'])
@@ -192,11 +189,8 @@ def studentInterviews():
         interview.position = Position.query.get(interview.pos_id)
     
     max_rounds = max([interview.round for interview in all_interviews])
-    interviews = [[]] * max_rounds
-    for interview in all_interviews : 
-        interviews[interview.round - 1].append(interview)
 
-    return render_template('student_interviews.j2', interviews = interviews, selections = selections)
+    return render_template('student_interviews.j2', interviews = interviews, selections = selections, max_rounds = max_rounds)
 
 @login_required
 @app.route('/student/select/<int:pos_id>', methods = ['POST'])
