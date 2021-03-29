@@ -35,6 +35,7 @@
         <th scope="col">CGPA Cutoff</th>
         <th scope="col">Location</th>
         <th scope="col">Number of Rounds</th>
+        <th scope="col">Interviews</th>
         </tr>
     </thead>
     <tbody>
@@ -45,6 +46,7 @@
                 <td> {{ pos.cgpa_cutoff }} </td>
                 <td> {{ pos.location }}</td>
                 <td> {{ pos.num_rounds }} </td>
+                <td> <a class="link-dark" href="/hr/position/{{ pos.pos_id }}">Interviews</a>
             </tr>
             <tr>
 			    <td colspan="6" style="padding:0;">

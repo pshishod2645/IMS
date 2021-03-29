@@ -153,9 +153,11 @@ def hrInterview(pos_id):
         interview.student = Student.query.filter_by(roll_no = interview.roll_no).first()
 
     position.interviews = all_interviews
-    qualified = [inter for inter in interviews if (inter.qualified == True) and (inter.round == position.num_rounds)]
+    qualified = [inter for inter in all_interviews if (inter.qualified == True) and (inter.round == position.num_rounds)]
 
-    return render_template('hr_interview.j2', position = positions, qualified = qualified) 
+    max_rounds = max([interview.round for interview in all_interviews])
+
+    return render_template('hr_interview.j2', position = position, qualified = qualified, max_rounds = max_rounds) 
 
 @login_required
 @app.route('/hr/<int:pos_id>/<string:roll_no>/<int:round>/modify', methods = ['POST'])
