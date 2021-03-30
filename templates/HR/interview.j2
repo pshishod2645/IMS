@@ -1,15 +1,31 @@
 {% extends 'base.j2' %}
 {% block content %}
 <h4 class="mt-3 ml-3"> Interviews for role {{ position.role }}, id: {{ position.pos_id }} <button class="btn btn-outline-dark float-right" onclick="cancel()"id="cancelbtn">Cancel</button></h4>
+<nav class = "my-3 mx-2">
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    {% for i in range(1, max_rounds + 1) %}
+        <a class = "nav-link {{ 'active' if i == 1 }}" data-toggle = "tab" role = "tab"
+        id = "tab_round_{{ i }}" href = "#content_round_{{ i }}" aria-selected = "{{ 'true' if i == 1 else 'false' }}">
+        Round {{ i }}</a>  
+    {% endfor %}
+    
+        <a class = "nav-link" data-toggle = "tab" role = "tab"
+            id = "tab_selections" href = "#content_selections" aria-selected = "false">
+            Selected Students</a> 
+  </div>
+</nav>
+
+<div class="tab-content" id="nav-tabContent">
 {% for i in range(1, max_rounds+1) %}
-    <table class="table table-hover">
+<div class="tab-pane fade {{ 'show active' if i == 1 }}" id="content_round_{{ i }}" role="tabpanel">
+    <table class="display" id = "round_{{ i }}_table">
         <thead>
-            <tr>
+            {# <tr>
             <th colspan="6" class="text-center">Round {{ i }}</th>
-            </tr>
+            </tr> #}
             <tr>
-            <th scope="col">Student Roll Number</th>
-            <th scope="col">Student IMS Username</th>
+            <th scope="col">Roll Number</th>
+            <th scope="col">IMS Username</th>
             <th scope="col">Status</th>
             {# <th scope="col">Time</th> #}
             <th scope="col">Qualified</th>
@@ -27,8 +43,6 @@
                     <td id = "qualified_{{ interview.student.roll_no }}_{{ i }}">
                     {% if interview.qualified is not none%}
                         {% if interview.qualified == 1 %}Qualified{% else %}Not Qualified{% endif %}
-                    {% else %} 
-                    {{ interview.qualified }} 
                     {% endif %}
                     </td>
                     {# <td> {{ interview.time }} </td> #}
@@ -47,13 +61,15 @@
             {% endfor %}
         </tbody>
     </table>
-    <br>
+</div> 
 {% endfor %}
-<table class="table table-hover">
+
+<div class="tab-pane fade {{ 'show active' if i == 1 }}" id="content_selections" role="tabpanel">
+<table class="display" id = "selections_table">
     <thead>
-        <tr>
+        {# <tr>
             <th colspan="6" class="text-center">Selected Students</th>
-        </tr>
+        </tr> #}
         <tr>
             <th scope="col">Student Roll Number</th>
             <th scope="col">Student IMS Username</th>
@@ -74,8 +90,17 @@
         {% endfor %}
     </tbody>
 </table>
+</div> 
+</div> 
+
 {% block javascript %}
 <script>
+$(document).ready(function(){
+    {% for i in range(1, max_rounds + 1) %}
+        $('#round_{{ i }}_table').DataTable();
+    {% endfor %}
+    $('#selections_table').DataTable(); 
+});
 document.getElementById("cancelbtn").disabled = true;
 function update_status(roll_no, round) {
   document.getElementById("cancelbtn").disabled = false;

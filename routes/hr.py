@@ -12,7 +12,7 @@ def hrPositions():
     positions = Position.query.filter( (Position.company_name == HR.company_name) & (HR.username == current_user.username)).all()
     hr = HR.query.get(current_user.username)
 
-    return render_template('HR/positions.j2', positions = positions, company_name = hr.company_name)
+    return render_template('HR/positions.j2', positions = positions, company_name = hr.company_name, title = 'Positions')
 
 @app.route('/hr/position/<int:pos_id>')
 @login_required
@@ -33,7 +33,7 @@ def hrInterview(pos_id):
     else:
         max_rounds = max([interview.round for interview in all_interviews])
 
-    return render_template('HR/interview.j2', position = position, qualified = qualified, max_rounds = max_rounds) 
+    return render_template('HR/interview.j2', position = position, qualified = qualified, max_rounds = max_rounds, title = 'Interviews') 
 
 @app.route('/hr/<int:pos_id>/<string:roll_no>/<int:round>/modify', methods = ['POST'])
 @login_required
@@ -99,4 +99,4 @@ def createPosition():
         db.session.commit()
 
         return redirect('/hr/positions')
-    return render_template('HR/positions.j2')
+    return redirect('hr/positions')

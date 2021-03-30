@@ -17,15 +17,12 @@ def login():
             print(user)
             login_user(user)
             return redirect(next_url)
-    return render_template('User/login.j2')
+    return render_template('User/login.j2', title = 'Login')
 
 @app.route('/signup', methods = ['GET', 'POST'])
 def signup():
     if current_user.is_authenticated: 
         return redirect('/')
-
-    if request.method == 'GET':
-        return render_template('User/signup.j2', departments = Department.query.all())
 
     if request.method == 'POST':        # only for students
         form = request.form
@@ -45,8 +42,9 @@ def signup():
         db.session.add(user), db.session.commit()
         db.session.add(student), db.session.commit()
         flash('Account created successfully. Please login using the link.', 'message')
+        redirect('/')
 
-    return render_template('User/signup.j2')
+    return render_template('User/signup.j2', title = 'Signup')
 
 @app.route('/logout')
 @login_required
@@ -62,7 +60,7 @@ def profile():
         person = Student.query.get(current_user.username)
     else : 
         person = HR.query.get(current_user.username)
-    return render_template('User/profile.j2', person = person)
+    return render_template('User/profile.j2', person = person, title = 'Profile')
 
 @app.route('/changePassword', methods = ['POST'])
 @login_required

@@ -18,7 +18,7 @@ def studentPositions():
     for position in positions: 
         position.applied = (position.pos_id in appliedPositions)
 
-    return render_template('Student/positions.j2', positions = positions)
+    return render_template('Student/positions.j2', positions = positions, title = 'Positions')
 
 @app.route('/student/apply_to_position/<int:pos_id>', methods = ["POST"])
 @login_required
@@ -52,7 +52,7 @@ def studentInterviews():
             (Interview.qualified == True) ) 
     
     if len(all_interviews) == 0 : 
-        return render_template('Student/interviews.j2', interviews = [], selections = selections, max_rounds = 1, student = student)
+        return render_template('Student/interviews.j2', interviews = [], selections = selections, max_rounds = 1, student = student, title = 'Interviews')
 
     for interview in all_interviews: 
         interview.position = Position.query.get(interview.pos_id)
@@ -62,7 +62,7 @@ def studentInterviews():
 
     max_rounds = max([interview.round for interview in all_interviews])
 
-    return render_template('Student/interviews.j2', interviews = all_interviews, selections = selections, max_rounds = max_rounds, student = student)
+    return render_template('Student/interviews.j2', interviews = all_interviews, selections = selections, max_rounds = max_rounds, student = student, title = 'Interviews')
 
 @app.route('/student/select/<int:pos_id>', methods = ['POST'])
 @login_required

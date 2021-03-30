@@ -15,47 +15,46 @@
             </a> 
             </li> 
         </ul>
-        
         <ul class = "navbar-nav"> 
         {% if current_user.is_authenticated %}
         {#{% if false #%}#}
           {% if current_user.user_type in ['student', 'placecom', 'deprep'] %}
             <li class = "nav-item">
-              <a class = "nav-link" href = "/student/positions" > Positions </a>
+              <a class = "nav-link {{'active' if title == 'Positions' }}" href = "/student/positions" > Positions </a>
             </li>
             <li class = "nav-item">
-              <a class = "nav-link" href = "/student/interviews" > Interviews </a>
+              <a class = "nav-link {{'active' if title == 'Interviews' }}" href = "/student/interviews" > Interviews </a>
             </li>
           {% endif %}
 
           {% if current_user.user_type == 'deprep'%}
             <li class = "nav-item"> 
-              <a class = "nav-link" href = "/dep_statistics">Dep Statistics</a> 
+              <a class = "nav-link {{'active' if title == 'Dep Statistics' }}" href = "/dep_statistics">Dep Statistics</a> 
             </li> 
           {% endif %}
 
           {% if current_user.user_type == 'placecom'%}
             <li class = "nav-item"> 
-              <a class = "nav-link" href = "/allInterviews">All Interviews</a> 
+              <a class = "nav-link {{'active' if title == 'All Interviews' }}" href = "/allInterviews">All Interviews</a> 
             </li>
 
             <li class = "nav-item">
-              <a class = "nav-link" href = "/addHR">Add HR</a> 
+              <a class = "nav-link {{'active' if title == 'Add HR' }}" href = "/addHR">Add HR</a> 
             </li> 
           {% endif %}
 
           {% if current_user.user_type == 'hr' %}
             <li class = "nav-item"> 
-              <a class = "nav-link" href = "/hr/positions">Positions</a> 
+              <a class = "nav-link {{'active' if title == 'Positions' }}" href = "/hr/positions">Positions</a> 
             </li> 
             <li class = "nav-item">
-              <a class = "nav-link" href = "/addHR">Add HR</a> 
+              <a class = "nav-link {{'active' if title == 'Add HR' }}" href = "/addHR">Add HR</a> 
             </li> 
           {% endif %}
           
 
             <li> 
-              <a class = "nav-link" href = "/profile">My Profile</a>
+              <a class = "nav-link {{'active' if title == 'Profile' }}" href = "/profile">My Profile</a>
             </li> 
 
             <li class = "nav-item"> 
@@ -64,11 +63,11 @@
 
           {% else %}
             <li class = "nav-item"> 
-              <a class = "nav-link" href = "/login" >Login</a>
+              <a class = "nav-link {{'active' if title == 'Login'}} " href = "/login" >Login</a>
             </li> 
 
             <li class = "nav-item"> 
-              <a class = "nav-link" href = "/signup">Signup</a> 
+              <a class = "nav-link {{'active' if title == 'Signup' }}" href = "/signup">Signup</a> 
             </li> 
 
           {% endif %}
@@ -77,3 +76,6 @@
   </nav>
 
 </header>
+<script> 
+console.log('title: ', '{{ title }}');
+</script> 

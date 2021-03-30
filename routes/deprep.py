@@ -22,4 +22,4 @@ def depStatistics():
     db.session.commit()
     dep.total_students = Student.query.filter_by(dep_code = dep.dep_code).group_by(Student.username).count()
     # return 'No Department found! Inconsistencies in Database'
-    return render_template('Deprep/dep_statistics.j2', dep = dep)
+    return render_template('Deprep/dep_statistics.j2', dep = dep, title = 'Dep Statistics')

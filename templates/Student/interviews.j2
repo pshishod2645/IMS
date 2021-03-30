@@ -1,11 +1,26 @@
 {% extends 'base.j2' %}
 {% block content %}
-{% for i in range(1, max_rounds+1) %}
-    <table class="table table-hover">
+<nav class = "my-3 mx-2">
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    {% for i in range(1, max_rounds + 1) %}
+        <a class = "nav-link {{ 'active' if i == 1 }}" data-toggle = "tab" role = "tab"
+        id = "tab_round_{{ i }}" href = "#content_round_{{ i }}" aria-selected = "{{ 'true' if i == 1 else 'false' }}">
+        Round {{ i }}</a>  
+    {% endfor %}
+    
+        <a class = "nav-link" data-toggle = "tab" role = "tab"
+            id = "tab_offers" href = "#content_offers" aria-selected = "false">
+            Offers</a> 
+  </div>
+</nav>
+<div class="tab-content mx-2" id="nav-tabContent">
+{% for i in range(1, max_rounds + 1) %}
+  <div class="tab-pane fade {{ 'show active' if i == 1 }}" id="content_round_{{ i }}" role="tabpanel">
+    <table id = "round_{{ i }}_table" class=" display" style = "width:100%">
         <thead>
-            <tr>
+            {# <tr>
             <th colspan="6" class="text-center">Round {{ i }}</th>
-            </tr>
+            </tr> #}
             <tr>
             <th scope="col">Position ID</th>
             <th scope="col">Role</th>
@@ -28,7 +43,7 @@
                     {% if interview.qualified is not none%}
                         {% if interview.qualified == 1 %}Qualified{% else %}Not Qualified{% endif %}
                     {% else %} 
-                    {{ interview.qualified }} 
+                    {{ interview.qualified if interview.qualified}} 
                     {% endif %}
                     </td>
                 </tr>
@@ -36,13 +51,15 @@
             {% endfor %}
         </tbody>
     </table>
-    <br>
+  </div>
 {% endfor %}
-<table class="table table-hover">
+
+<div class="tab-pane fade" id="content_offers" role="tabpanel">
+<table id = "offers_table" class="table table-hover">
     <thead>
-        <tr>
+        {# <tr>
             <th colspan="6" class="text-center">Offers</th>
-        </tr>
+        </tr> #}
         <tr>
             <th scope="col">Position ID</th>
             <th scope="col">Role</th>
@@ -74,8 +91,18 @@
         {% endfor %}
     </tbody>
 </table>
+</div> 
+</div>
+
 {% block javascript %}
 <script>
+$(document).ready(function() {
+    {% for i in range(1, max_rounds + 1) %}
+        $('#round_{{ i }}_table').DataTable(); 
+    {% endfor %}
+    $('#offers_table').DataTable(); 
+} );
+
 function select(pos_id) {
   var apply_button = document.getElementById("select_"+pos_id);
   apply_button.disabled = true;
@@ -100,5 +127,6 @@ function select(pos_id) {
 }
 </script>
 {% endblock %}
+
 {% endblock %}
 

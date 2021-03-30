@@ -27,7 +27,7 @@ def allInterviews():
     else:
         max_rounds = max([interview.round for interview in interviews])
 
-    return render_template('Placecom/allInterviews.j2', interviews = interviews, max_rounds = max_rounds, selections = selections)
+    return render_template('Placecom/allInterviews.j2', interviews = interviews, max_rounds = max_rounds, selections = selections, title = 'All Interviews')
 
 @app.route('/addHR', methods = ['GET', 'POST'])
 @login_required
@@ -72,4 +72,4 @@ def addHR():
         db.session.add(hr), db.session.commit()
         flash("Account added.", 'message')
 
-    return render_template('Placecom/addHr.j2', companies = companies)
+    return render_template('Placecom/addHr.j2', companies = companies, title = 'Add HR')
