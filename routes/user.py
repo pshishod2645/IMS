@@ -43,9 +43,8 @@ def signup():
 
         db.session.add(user), db.session.commit()
         db.session.add(student), db.session.commit()
-
-        login_user(user)
-        return redirect('/')
+        flash('Account created successfully. Please login using the link.')
+        
     return render_template('User/signup.j2')
 
 @login_required

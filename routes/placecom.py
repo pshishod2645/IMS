@@ -70,6 +70,7 @@ def addHR():
 
         db.session.add(user), db.session.commit()
         db.session.add(hr), db.session.commit()
-        return 'Account Added'
+        flash("Account added.")
+        return render_template('Placecom/addHr.j2', companies = companies)
 
     return render_template('Placecom/addHr.j2', companies = companies)

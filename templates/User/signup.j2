@@ -1,6 +1,11 @@
 {% extends 'base.j2' %}
 {% block content %}
-
+{% for message in get_flashed_messages() %}
+    <div class="alert alert-primary alert-dismissible fade show">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+{% endfor %}
 <form action="" method="post" id="signup" class="mt-3 ml-3 col-sm-6">
 	<div class="form-group">
 	      <label for="username">Username</label>
