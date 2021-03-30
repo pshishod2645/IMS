@@ -3,8 +3,8 @@ from flask import render_template, request, redirect, url_for, flash, Response
 from models import * 
 from wsgi import db, app
 
-@login_required
 @app.route('/hr/positions')
+@login_required
 def hrPositions():
     if current_user.user_type not in ['hr']: 
         return redirect('/')
@@ -14,8 +14,8 @@ def hrPositions():
 
     return render_template('HR/positions.j2', positions = positions, company_name = hr.company_name)
 
-@login_required
 @app.route('/hr/position/<int:pos_id>')
+@login_required
 def hrInterview(pos_id): 
     position = Position.query.get(pos_id)
     all_interviews = Interview.query.filter_by(pos_id = pos_id).all()
@@ -35,8 +35,8 @@ def hrInterview(pos_id):
 
     return render_template('HR/interview.j2', position = position, qualified = qualified, max_rounds = max_rounds) 
 
-@login_required
 @app.route('/hr/<int:pos_id>/<string:roll_no>/<int:round>/modify', methods = ['POST'])
+@login_required
 def approveOrRejectForPosition(pos_id, roll_no, round): 
     if current_user.user_type not in ['hr'] : 
         return Response(status = 201)
@@ -77,8 +77,8 @@ def approveOrRejectForPosition(pos_id, roll_no, round):
     print('Nothing to change') 
     return Response(status = 201)
 
-@login_required
 @app.route('/hr/createPosition', methods = ['GET', 'POST'])
+@login_required
 def createPosition(): 
     if current_user.user_type not in ['hr']: 
         return Response(status = 201)

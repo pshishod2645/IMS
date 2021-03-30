@@ -5,8 +5,9 @@ from wsgi import db, app
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login(): 
+    next_url = request.args.get('next', default = '/')
     if current_user.is_authenticated: 
-        return redirect('/')
+        return redirect(next_url)
 
     if request.method == 'POST' : 
         username, password = request.form.get('username'), request.form.get('password')
@@ -15,7 +16,7 @@ def login():
         if user : 
             print(user)
             login_user(user)
-            return redirect('/')
+            return redirect(next_url)
     return render_template('User/login.j2')
 
 @app.route('/signup', methods = ['GET', 'POST'])
@@ -47,14 +48,14 @@ def signup():
 
     return render_template('User/signup.j2')
 
-@login_required
 @app.route('/logout')
+@login_required
 def logout(): 
     logout_user()
     return redirect('/')
 
-@login_required
 @app.route('/profile')
+@login_required
 def profile(): 
     person = None
     if current_user.user_type in ['student', 'deprep', 'placecom'] : 
@@ -63,8 +64,8 @@ def profile():
         person = HR.query.get(current_user.username)
     return render_template('User/profile.j2', person = person)
 
-@login_required
 @app.route('/changePassword', methods = ['POST'])
+@login_required
 def changePassword(): 
     user = User.query.get(current_user.username)
     new_password = request.form.get('new_password', type = str)

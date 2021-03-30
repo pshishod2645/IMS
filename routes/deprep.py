@@ -10,15 +10,16 @@ def getShortlistedAndPlaced(dep_code):
             (Interview.round == Position.num_rounds)).group_by(Student.username).count()
     return len(placed), num_shortlisted
 
-@login_required
 @app.route('/dep_statistics') 
+@login_required
 def depStatistics(): 
     if current_user.user_type not in ['deprep'] : 
         return redirect('/')
 
     dep = Department.query.filter((Student.username == current_user.username) & (Student.dep_code == Department.dep_code) ).first()
     assert dep is not None
-    dep.placed, dep.shortlisted = getShortlistedAndPlaced(dep.dep_code)
+    dep.students_placed, dep.students_shortlisted = getShortlistedAndPlaced(dep.dep_code)
     db.session.commit()
+    dep.total_students = Student.query.filter_by(dep_code = dep.dep_code).group_by(Student.username).count()
     # return 'No Department found! Inconsistencies in Database'
     return render_template('Deprep/dep_statistics.j2', dep = dep)

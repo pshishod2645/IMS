@@ -3,8 +3,8 @@ from flask import render_template, request, redirect, url_for, flash, Response
 from models import * 
 from wsgi import db, app
 
-@login_required
 @app.route('/allInterviews')
+@login_required
 def allInterviews(): 
     if current_user.user_type not in ['placecom']: 
         return redirect('/')
@@ -29,8 +29,8 @@ def allInterviews():
 
     return render_template('Placecom/allInterviews.j2', interviews = interviews, max_rounds = max_rounds, selections = selections)
 
-@login_required
 @app.route('/addHR', methods = ['GET', 'POST'])
+@login_required
 def addHR(): 
     if current_user.user_type not in ['placecom', 'hr'] : 
         redirect('/')

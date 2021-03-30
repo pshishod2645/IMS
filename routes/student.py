@@ -3,8 +3,8 @@ from flask import render_template, request, redirect, url_for, flash, Response
 from models import * 
 from wsgi import db, app
 
-@login_required
 @app.route('/student/positions')
+@login_required
 def studentPositions(): 
     if current_user.user_type not in ['student', 'placecom', 'deprep']:
         return redirect('/')
@@ -20,8 +20,8 @@ def studentPositions():
 
     return render_template('Student/positions.j2', positions = positions)
 
-@login_required
 @app.route('/student/apply_to_position/<int:pos_id>', methods = ["POST"])
+@login_required
 def applyToPosition(pos_id): 
     if current_user.user_type not in ['student', 'placecom', 'deprep']: 
         return flask.Response(status = 201)
@@ -39,8 +39,8 @@ def applyToPosition(pos_id):
         return Response(status = 201)
     return Response(status = 200)
 
-@login_required
 @app.route('/student/interviews')
+@login_required
 def studentInterviews(): 
     if current_user.user_type not in ['placecom', 'student', 'deprep'] : 
         return redirect('/')
@@ -64,8 +64,8 @@ def studentInterviews():
 
     return render_template('Student/interviews.j2', interviews = all_interviews, selections = selections, max_rounds = max_rounds, student = student)
 
-@login_required
 @app.route('/student/select/<int:pos_id>', methods = ['POST'])
+@login_required
 def selectPosition(pos_id): 
     if current_user.user_type not in ['student', 'placecom', 'deprep']: 
         return Response(status = 201)
