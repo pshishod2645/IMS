@@ -62,3 +62,17 @@ def profile():
     else : 
         person = HR.query.get(current_user.username)
     return render_template('User/profile.j2', person = person)
+
+@login_required
+@app.route('/changePassword', methods = ['POST'])
+def changePassword(): 
+    user = User.query.get(current_user.username)
+    new_password = request.form.get('new_password', type = str)
+    if (not new_password) or (len(new_password) == 0) : 
+        flash('New password Invalid! Password Not changed', 'danger')
+        return redirect('/profile')
+    user.password = new_password
+    db.session.commit()
+
+    flash('Password Changed!', 'success')
+    return redirect('/profile')
