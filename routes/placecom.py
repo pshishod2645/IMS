@@ -14,12 +14,20 @@ def allInterviews():
         interview.student = Student.query.filter_by(roll_no = interview.roll_no).first()
         interview.position = Position.query.get(interview.pos_id)
 
+    selections = Interview.query.filter((Position.pos_id == Interview.pos_id) & \
+        (Position.num_rounds == Interview.round) & \
+            (Interview.qualified == True) )
+    
+    for sel_interview in selections: 
+        sel_interview.student = Student.query.filter_by(roll_no = sel_interview.roll_no).first()
+        sel_interview.position = Position.query.get(sel_interview.pos_id)
+        
     if not interviews:
         max_rounds = 1
     else:
         max_rounds = max([interview.round for interview in interviews])
 
-    return render_template('Placecom/allInterviews.j2', interviews = interviews, max_rounds = max_rounds)
+    return render_template('Placecom/allInterviews.j2', interviews = interviews, max_rounds = max_rounds, selections = selections)
 
 @login_required
 @app.route('/addHR', methods = ['GET', 'POST'])
@@ -64,4 +72,4 @@ def addHR():
         db.session.add(hr), db.session.commit()
         return 'Account Added'
 
-    return render_template('Placecom/addHR.j2', companies = companies)
+    return render_template('Placecom/addHr.j2', companies = companies)
