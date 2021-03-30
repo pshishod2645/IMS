@@ -42,11 +42,16 @@ def signup():
         student.cgpa = form.get('cgpa'), 
         student.dep_code = form.get('dep_code') 
 
-        db.session.add(user), db.session.commit()
-        db.session.add(student), db.session.commit()
-        flash('Account created successfully. Please login using the link.', 'message')
-
-    return render_template('User/signup.j2')
+        try:
+            db.session.add(user)
+            db.session.flush()
+            db.session.add(student)
+            db.session.commit()
+            flash('Account created successfully. Please login using the link.', 'message')
+        except:
+            db.session.rollback()
+            flash('Signup failed. Ensure unique username, email address and roll number.', 'error')
+    return render_template('User/signup.j2', departments = Department.query.all())
 
 @app.route('/logout')
 @login_required

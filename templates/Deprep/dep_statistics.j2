@@ -13,14 +13,17 @@ function drawBasic() {
 
      var data = google.visualization.arrayToDataTable([
         ["Element", "Number of Students", { role: "style" } ],
-        ["Students Placed", {{ dep.students_placed }}, 'color: green'],
-        ["Students Shortlisted", {{ dep.students_shortlisted }}, 'color: yellow'],
-        ['Total Students', {{ dep.total_students }},  'color: blue']
+        ["Students Placed", {{ dep.students_placed }}, 'color: #79FF4D'],
+        ["Students Shortlisted", {{ dep.students_shortlisted }}, 'color: #FFFF4D'],
+        ['Total Students', {{ dep.total_students }},  'color: #66B3FF']
       ]);
 
       var options = {
         title: 'Placement Statistics',
-        legend: {position:'none'}, 
+        legend: {position:'none'},
+        vAxis: { ticks: [
+          {% for i in range(0, dep.total_students+2) %}{{ i }},{% endfor %}
+          ] }
       };
 
       var chart = new google.visualization.ColumnChart(
