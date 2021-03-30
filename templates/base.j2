@@ -28,6 +28,14 @@
 
 <body>   
     {% include 'navbar.j2' %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+	{% for category,  message in messages %}
+        <div class="{{ 'alert alert-dismissible fade show alert-' + category }}">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message }}
+        </div>
+	{% endfor %}
+    {% endwith %}
     {% block content %} {% endblock %}
 </body>
 
