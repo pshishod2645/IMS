@@ -17,6 +17,7 @@
         </ul>
         
         <ul class = "navbar-nav"> 
+        {% if current_user.is_authenticated %}
         {#{% if false #%}#}
           {% if current_user.user_type in ['student', 'placecom', 'deprep'] %}
             <li class = "nav-item">
@@ -33,15 +34,28 @@
             </li> 
           {% endif %}
 
+          {% if current_user.user_type == 'placecom'%}
+            <li class = "nav-item"> 
+              <a class = "nav-link" href = "/allInterviews">All Interviews</a> 
+            </li>
+
+            <li class = "nav-item">
+              <a class = "nav-link" href = "/addHR">Add HR</a> 
+            </li> 
+          {% endif %}
+
           {% if current_user.user_type == 'hr' %}
             <li class = "nav-item"> 
               <a class = "nav-link" href = "/hr/positions">Positions</a> 
             </li> 
+            <li class = "nav-item">
+              <a class = "nav-link" href = "/addHR">Add HR</a> 
+            </li> 
           {% endif %}
           
-          {% if current_user.is_authenticated %}
+
             <li> 
-              <a class = "nav-link" href = "{{'/profile/' + current_user.username}}">My Profile</a>
+              <a class = "nav-link" href = "/profile">My Profile</a>
             </li> 
 
             <li class = "nav-item"> 

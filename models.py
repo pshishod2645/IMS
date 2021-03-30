@@ -39,11 +39,6 @@ class Department(db.Model):
 class Student(db.Model):
     __table__ = db.Model.metadata.tables['student'] 
 
-
-# create table applytoposition(pos_id int NOT NULL, roll_no varchar(9) NOT NULL, primary key(pos_id, roll_no), foreign key pid(pos_id) references pos(pos_id), foreign key roll(roll_no) references student(roll_no));
-class ApplyToPosition(db.Model): 
-    __table__ = db.Model.metadata.tables['applytoposition']
-
 # create table placecom(roll_no varchar(9), primary key(roll_no), foreign key roll(roll_no) references student(roll_no));
 class Placecom(db.Model): 
     __table__ = db.Model.metadata.tables['placecom']
@@ -61,6 +56,6 @@ class HR(db.Model):
     __table__ = db.Model.metadata.tables['hr']
 
 all_models = [User, Company, Position, Department, Student, \
-    ApplyToPosition, Placecom, Interview, DepartmentRep, HR]
+    Placecom, Interview, DepartmentRep, HR]
 for model in all_models: 
     admin.add_view(ModelView(model, db.session))

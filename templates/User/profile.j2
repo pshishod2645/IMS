@@ -1,0 +1,51 @@
+{% extends 'base.j2' %}
+{% block content %}
+<ul class="list-group mt-3 ml-3">
+  <li class="list-group-item">Username: {{ current_user.username }}</li>
+  <li class = "list-group-item"> Password: <span id = "password"> {{'*'  * (current_user.password | length) }}</span>  
+    <span class= "pt-3"> 
+      <span role = "button" style = "display:none;" id = "hide-password" onclick = "togglePass()"> 
+        <i class = "material-icons d-inline-block align-bottom">visibility</i> </span> 
+      <span role = "button" id = "show-password" onclick = "togglePass()"> 
+        <i class = "material-icons d-inline-block align-bottom">visibility_off</i></span> 
+      </span>
+    <div> 
+      <small> <a role="button" style = "color: blue"onclick = "$('form').toggle()">Change Password?</a> </small>
+      <form style="display:none;" action = "/changePassword" method = "POST" >
+        <input class = "form-control col-2" name= "new_password" placeholder = "New Password" type = "password">  
+        <button class = "btn btn-info btn-sm mt-2">Change Password</button>
+      </form>  
+    </div>  
+  </li>
+  <li class="list-group-item">Email: {{ current_user.email }} </li>
+  <li class="list-group-item">Full Name: {{ current_user.full_name }}</li>
+{% if current_user.user_type == "student" %}
+  <li class="list-group-item">Account Type: STUDENT</li>
+  <li class="list-group-item">Roll Number: {{ person.roll_no }}</li>
+  <li class="list-group-item">Department: {{ person.dep_code }}</li>
+{% elif current_user.user_type == "hr" %}
+  <li class="list-group-item">Account Type: HR REPRESENTATIVE</li>
+  <li class="list-group-item">Company: {{ person.company_name }}</li>
+  <li class="list-group-item">Assigned Placecom Roll Number: {{ person.placecom_assgn_roll_no }}</li>
+{% elif current_user.user_type == "placecom" %}
+  <li class="list-group-item">Account Type: PLACECOM</li>
+{% elif current_user.user_type == "deprep"%}
+  <li class="list-group-item">Account Type: DEPARTMENT REPRESENTATIVE</li>
+  <li class="list-group-item">Department: {{ person.dep_code }}</li>
+{% endif %}
+</ul>
+
+<script> 
+$('#show-password').click(function(){
+  $('#password').html("{{ current_user.password }}");
+  $('#show-password').hide()
+  $('#hide-password').show()
+}); 
+
+$('#hide-password').click(function(){
+  $('#password').html("{{ '*' * (current_user.password | length) }}");
+  $('#hide-password').hide(); 
+  $('#show-password').show(); 
+});
+</script> 
+{% endblock %}
