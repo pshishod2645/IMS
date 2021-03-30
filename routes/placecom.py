@@ -68,8 +68,14 @@ def addHR():
         hr.company_name = form.get('company_name', type = str)
         hr.placecom_assgn_roll_no = placecom_assgn_roll_no
 
-        db.session.add(user), db.session.commit()
-        db.session.add(hr), db.session.commit()
-        flash("Account added.", 'message')
+        try:
+            db.session.add(user)
+            db.session.flush()
+            db.session.add(hr)
+            db.session.commit()
+            flash('Account added.', 'success')
+        except:
+            db.session.rollback()
+            flash('Account creation failed. Ensure unique username and email address.', 'danger')
 
     return render_template('Placecom/addHr.j2', companies = companies)

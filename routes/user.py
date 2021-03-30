@@ -12,11 +12,11 @@ def login():
     if request.method == 'POST' : 
         username, password = request.form.get('username'), request.form.get('password')
         user = User.query.filter( ((User.email == username) | (User.username == username) ) & (User.password == password) ).first()
-        # print(user)
-        if user : 
-            print(user)
+        if user :
             login_user(user)
             return redirect(next_url)
+        else:
+            flash("Login failed. Please enter valid credentials and try again, or signup for a new account.", 'danger')
     return render_template('User/login.j2')
 
 @app.route('/signup', methods = ['GET', 'POST'])
@@ -47,10 +47,10 @@ def signup():
             db.session.flush()
             db.session.add(student)
             db.session.commit()
-            flash('Account created successfully. Please login using the link.', 'message')
+            flash('Account created successfully. Please login using the link.', 'success')
         except:
             db.session.rollback()
-            flash('Signup failed. Ensure unique username, email address and roll number.', 'error')
+            flash('Signup failed. Ensure unique username, email address and roll number.', 'danger')
     return render_template('User/signup.j2', departments = Department.query.all())
 
 @app.route('/logout')
